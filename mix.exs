@@ -21,7 +21,9 @@ defmodule StrongParams.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:deep_merge, " ~> 1.0"}
+      {:deep_merge, " ~> 1.0"},
+      {:plug, " ~> 1.11"},
+      {:phoenix, " ~> 1.5", only: :test}
     ]
   end
 end

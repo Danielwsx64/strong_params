@@ -4,7 +4,7 @@ defmodule StrongParams.Filter do
 
   alias StrongParams.Error
 
-  def apply(params, filters, _opts \\ []) do
+  def apply(params, filters) do
     required = Keyword.get(filters, :required, [])
     permited = Keyword.get(filters, :permited, [])
 

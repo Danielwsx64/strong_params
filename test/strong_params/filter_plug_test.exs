@@ -66,6 +66,7 @@ defmodule StrongParams.FilterPlugTest do
 
       result = FilterPlug.call(conn, opts)
 
+      assert result.halted == true
       assert result.state == :sent
       assert result.status == 400
 
@@ -89,6 +90,7 @@ defmodule StrongParams.FilterPlugTest do
 
       result = FilterPlug.call(conn, opts)
 
+      assert result.halted == true
       assert result.state == :sent
       assert result.status == 400
 

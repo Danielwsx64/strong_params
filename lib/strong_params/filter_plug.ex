@@ -30,10 +30,14 @@ defmodule StrongParams.FilterPlug do
         |> halt()
 
       [{:module, plug}] ->
-        plug.call(conn, error)
+        conn
+        |> plug.call(error)
+        |> halt()
 
       [{:function, func}] ->
-        apply(caller, func, [conn, error])
+        caller
+        |> apply(func, [conn, error])
+        |> halt()
     end
   end
 

@@ -41,7 +41,7 @@ defmodule StrongParams.FilterTest do
         "role" => "admin"
       }
 
-      result = Filter.apply(params, permited: [:alias, :name, :description])
+      result = Filter.apply(params, permited: [:nickname, :name, :description])
 
       assert result == %{
                name: "Johnny Lawrence",
@@ -125,16 +125,13 @@ defmodule StrongParams.FilterTest do
         }
       }
 
-      filters = [required: [:age, :alias, address: [:street]]]
+      filters = [required: [:age, :nickname, address: [:street]]]
 
       result = Filter.apply(params, filters)
 
       assert result == %Error{
                type: "required",
-               errors: [
-                 {:alias, "is required"},
-                 {:age, "is required"}
-               ]
+               errors: %{nickname: "is required", age: "is required"}
              }
     end
 
@@ -149,17 +146,19 @@ defmodule StrongParams.FilterTest do
         }
       }
 
-      filters = [required: [:name, :alias, address: [:city], attachments: [info: [:type, :size]]]]
+      filters = [
+        required: [:name, :nickname, address: [:city], attachments: [info: [:type, :size]]]
+      ]
 
       result = Filter.apply(params, filters)
 
       assert result == %Error{
                type: "required",
-               errors: [
-                 {:attachments, [info: [size: "is required"]]},
-                 {:address, [city: "is required"]},
-                 {:alias, "is required"}
-               ]
+               errors: %{
+                 attachments: %{info: %{size: "is required"}},
+                 address: %{city: "is required"},
+                 nickname: "is required"
+               }
              }
     end
 
@@ -180,7 +179,7 @@ defmodule StrongParams.FilterTest do
 
       assert result == %Error{
                type: "required",
-               errors: [{:attachments, [info: [size: "is required"]]}]
+               errors: %{attachments: %{info: %{size: "is required"}}}
              }
     end
   end

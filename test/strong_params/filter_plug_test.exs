@@ -4,9 +4,6 @@ defmodule StrongParams.FilterPlugTest do
   alias Plug.Conn
   alias StrongParams.FilterPlug
 
-  defmodule FallbackExample do
-  end
-
   describe "init/1" do
     test "keep options" do
       opts = [required: [:name], permited: [:alias], caller: :module]
@@ -73,7 +70,7 @@ defmodule StrongParams.FilterPlugTest do
       assert result.status == 400
 
       assert result.resp_body ==
-               "%StrongParams.Error{errors: [name: \"is required\"], type: \"required\"}"
+               "%StrongParams.Error{errors: %{name: \"is required\"}, type: \"required\"}"
     end
 
     test "use fallback function when it is set", %{conn: conn} do
@@ -96,7 +93,7 @@ defmodule StrongParams.FilterPlugTest do
       assert result.status == 400
 
       assert result.resp_body ==
-               "%StrongParams.Error{errors: [name: \"is required\"], type: \"required\"}"
+               "%StrongParams.Error{errors: %{name: \"is required\"}, type: \"required\"}"
     end
 
     test "ignore halted conn", %{conn: conn} do

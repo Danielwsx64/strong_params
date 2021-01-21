@@ -51,18 +51,18 @@ defmodule StrongParams.Filter do
   end
 
   defp add_to_result(%Error{errors: errors} = error, key, :key_not_found, :required),
-    do: %{error | errors: [{key, "is required"} | errors]}
+    do: %{error | errors: Map.put(errors, key, "is required")}
 
   defp add_to_result(%{}, key, :key_not_found, :required),
-    do: %Error{type: "required", errors: [{key, "is required"}]}
+    do: %Error{type: "required", errors: Map.new([{key, "is required"}])}
 
   defp add_to_result(result, _key, :key_not_found, :permited), do: result
 
   defp add_to_result(%Error{errors: first_errors} = error, key, %Error{errors: errors}, _mode),
-    do: %{error | errors: [{key, errors} | first_errors]}
+    do: %{error | errors: Map.put(first_errors, key, errors)}
 
   defp add_to_result(%{}, key, %Error{errors: errors} = error, _mode),
-    do: %{error | errors: [{key, errors}]}
+    do: %{error | errors: Map.new([{key, errors}])}
 
   defp add_to_result(%Error{} = error, _key, _value, _mode), do: error
   defp add_to_result(%{} = result, key, value, _mode), do: put_new(result, key, value)

@@ -1,18 +1,35 @@
 defmodule StrongParams do
-  @moduledoc """
-  Documentation for `StrongParams`.
-  """
+  defmacro filter_for(filter_action, filters) do
+    guard =
+      {:{}, [],
+       [
+         :==,
+         [line: __CALLER__.line],
+         [{:{}, [], [:action, [line: __CALLER__.line], nil]}, filter_action]
+       ]}
 
-  @doc """
-  Hello world.
+    filters = Keyword.put(filters, :caller, __CALLER__.module)
 
-  ## Examples
+    quote do
+      @plugs {unquote(StrongParams.FilterPlug), unquote(filters), unquote(guard)}
+    end
+  end
 
-      iex> StrongParams.hello()
-      :world
+  defmacro __using__(_opts) do
+    quote do
+      @before_compile StrongParams
 
-  """
-  def hello do
-    :world
+      import StrongParams
+    end
+  end
+
+  defmacro __before_compile__(env) do
+    controller_fallback = Module.get_attribute(env.module, :phoenix_fallback)
+
+    Module.register_attribute(env.module, :strong_params_controller_fallback, persist: true)
+
+    quote do
+      @strong_params_controller_fallback unquote(controller_fallback)
+    end
   end
 end

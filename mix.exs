@@ -34,7 +34,8 @@ defmodule StrongParams.MixProject do
     [
       {:deep_merge, " ~> 1.0"},
       {:plug, " ~> 1.11"},
-      {:phoenix, " ~> 1.5", only: :test}
+      {:phoenix, " ~> 1.5", only: :test},
+      {:ex_doc, "~> 0.23.0", only: :dev, runtime: false}
     ]
   end
 

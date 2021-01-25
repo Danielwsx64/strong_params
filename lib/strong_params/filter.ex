@@ -34,7 +34,7 @@ defmodule StrongParams.Filter do
   end
 
   defp reduce_function(filter, {result, params}, mode) when is_atom(filter) do
-    params_value = get_from(params, to_string(filter))
+    params_value = get(params, to_string(filter), :key_not_found)
 
     result
     |> add_to_result(filter, params_value, mode)
@@ -42,7 +42,7 @@ defmodule StrongParams.Filter do
   end
 
   defp reduce_function({filter, filter_rest}, {result, params}, mode) when is_atom(filter) do
-    params_value = get_from(params, to_string(filter))
+    params_value = get(params, to_string(filter), %{})
     filtered = apply_filters(%{}, filter_rest, params_value, mode)
 
     result
@@ -66,8 +66,6 @@ defmodule StrongParams.Filter do
 
   defp add_to_result(%Error{} = error, _key, _value, _mode), do: error
   defp add_to_result(%{} = result, key, value, _mode), do: put_new(result, key, value)
-
-  defp get_from(params, key), do: get(params, key, :key_not_found)
 
   defp respond_reduce_with(result, params), do: {result, params}
 end

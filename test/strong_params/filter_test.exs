@@ -162,6 +162,36 @@ defmodule StrongParams.FilterTest do
              }
     end
 
+    test "empty map and when value is not a map" do
+      empty_params = %{}
+      params_with_empty_map = %{name: "Johnny Lawrence", nickname: "Johnny", address: %{}}
+      params_with_not_a_map = %{name: "Johnny Lawrence", nickname: "Johnny", address: []}
+
+      filters = [
+        required: [:name, :nickname, address: [:city], attachments: [info: [:type, :size]]]
+      ]
+
+      empty_params_result = Filter.apply(empty_params, filters)
+      params_with_empty_map_result = Filter.apply(params_with_empty_map, filters)
+      params_with_not_a_map_result = Filter.apply(params_with_not_a_map, filters)
+
+      expected_error = %Error{
+        type: "required",
+        errors: %{
+          address: %{city: "is required"},
+          attachments: %{
+            info: %{size: "is required", type: "is required"}
+          },
+          nickname: "is required",
+          name: "is required"
+        }
+      }
+
+      assert empty_params_result == expected_error
+      assert params_with_empty_map_result == expected_error
+      assert params_with_not_a_map_result == expected_error
+    end
+
     test "dont return permited when required has errors" do
       params = %{
         "name" => "Johnny Lawrence",

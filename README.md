@@ -114,3 +114,11 @@ You must call `filter_for/2` for each action you want to filter the params.
 filter_for(:create, required: [:name, :email], permited: [:nickname])
 filter_for(:update, permited: [:name, :email, :nickname])
 ```
+
+## Contributing
+
+[Contributing Guide](CONTRIBUTING.md)
+
+## License
+
+[Apache License, Version 2.0](LICENSE) © [brainn.co](https://github.com/brainn-co)

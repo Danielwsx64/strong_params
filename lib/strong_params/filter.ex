@@ -1,4 +1,5 @@
 defmodule StrongParams.Filter do
+  @moduledoc false
   import Map, only: [put_new: 3, get: 3]
   import DeepMerge, only: [deep_merge: 2]
 
@@ -24,8 +25,6 @@ defmodule StrongParams.Filter do
     |> apply_filters(permited, params, :permited)
     |> deep_merge(initial)
   end
-
-  defp apply_filters(%Error{} = error, _filters, _params, :permited), do: error
 
   defp apply_filters(initial, filters, params, mode) do
     {result, _params} = Enum.reduce(filters, {initial, params}, &reduce_function(&1, &2, mode))

@@ -14,7 +14,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 2.  Update the library documentation accordingly new changes.
 
-3.  If your pull request is a patch you may point it to master branch. If it's a feature
+3.  If your pull request is a patch you may point it to main branch. If it's a feature
     implementation you must point to the current release branch (usualy the next minor version eg `release-0.7.0`)
 
 4.  You may merge the Pull Request in once you have the sign-off of two other developers, or if you
@@ -22,5 +22,5 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 ## Publish
 
-Every pull request to master branch will release a new version of xcribe on hex.pm.
+Every pull request to main branch will release a new version of StrongParams on hex.pm.
 So make sure to update the changelog and bump the version before merging the PR.

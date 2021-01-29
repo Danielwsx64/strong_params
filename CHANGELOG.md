@@ -7,4 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-[unreleased]: https://github.com/brainnco/strong_params/compare/v0.0.3...main
+## [0.0.4] - 2021-01-29
+
+### Enhancements
+
+- Add lib documentation
+
+[unreleased]: https://github.com/brainnco/strong_params/compare/v0.0.4...main
+[0.0.4]: https://github.com/brainnco/strong_params/compare/v0.0.3...v0.0.4

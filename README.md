@@ -19,7 +19,7 @@ mix.exs
 ```elixir
 def deps do
   [
-    {:strong_params, "~> 0.0.3"}
+    {:strong_params, "~> 0.0.4"}
   ]
 end
 ```

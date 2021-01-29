@@ -13,7 +13,7 @@ defmodule StrongParams.MixProject do
       source_url: @links["GitHub"],
       package: package(),
       docs: docs(),
-      elixir: "~> 1.10",
+      elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps()

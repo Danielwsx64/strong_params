@@ -1,4 +1,5 @@
 defmodule StrongParams.FilterPlug do
+  @moduledoc false
   import Plug.Conn
 
   alias StrongParams.{Error, Filter}

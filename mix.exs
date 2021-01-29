@@ -12,6 +12,7 @@ defmodule StrongParams.MixProject do
       description: @description,
       source_url: @links["GitHub"],
       package: package(),
+      docs: docs(),
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -34,8 +35,12 @@ defmodule StrongParams.MixProject do
     [
       {:deep_merge, " ~> 1.0"},
       {:plug, " ~> 1.11"},
+
+      # Dev/Test dependencies
+
       {:phoenix, " ~> 1.5", only: :test},
-      {:ex_doc, "~> 0.23.0", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.23.0", only: :dev, runtime: false},
+      {:credo, "~> 1.5", only: :dev}
     ]
   end
 
@@ -43,6 +48,17 @@ defmodule StrongParams.MixProject do
     [
       licenses: ["Apache-2.0"],
       links: @links
+    ]
+  end
+
+  defp docs do
+    [
+      source_ref: "v#{@version}",
+      main: "readme",
+      extras: [
+        "README.md": [title: "Get starting"]
+      ],
+      groups_for_modules: []
     ]
   end
 end

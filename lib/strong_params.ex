@@ -1,4 +1,52 @@
 defmodule StrongParams do
+  @moduledoc """
+  It filters request params keeping only explicitly enumerated parameters.
+  """
+
+  @doc """
+  Macro to add filter for action parameters.
+
+  It adds a `Plug` to filter request params before `Phoenix` call the respective
+  controller action. This macro must be called inside a Phoenix controller implementation.
+
+  The first given argument must be a valid action name. The second must be a `Keyword`
+  with the list of required and permited parameters. The `Keyword` may have both lists or
+  just one of them:
+
+    * `:permited` - List of parameters to keep. If some of listed parameters is missing no error is returned.
+    * `:required` - List of parameters that are required. In case of missing parameters a error will be returned with a map enumerating the missing parameters.
+
+  ```elixir
+  filter_for(:index, required: [:name, :email], permited: [:nickname])
+  ```
+
+  For nested parameters you must use a keyword.
+
+  Exemple:
+
+  ```elixir
+  filter_for(:index, required: [:name, :email, address: [:street, :city]], permited: [:nickname])
+
+  # Expected filtered parameters
+  %{
+     name: "Johnny Lawrence",
+     nickname: "John",
+     email: "john@mail.com",
+     address: %{
+       street: "5º Avenue",
+       city: "NY"
+     }
+  }
+  ```
+  """
+
+  @type parameters_list :: [atom | [{atom, parameters_list()}]]
+  @type filters ::
+          [required: parameters_list, permited: parameters_list]
+          | [required: parameters_list]
+          | [permited: parameters_list]
+
+  @spec filter_for(atom, filters()) :: any
   defmacro filter_for(filter_action, filters) do
     guard =
       {:{}, [],

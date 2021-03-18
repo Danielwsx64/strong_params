@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-elixir@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-elixir@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-16.04
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-elixir@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
@@ -62,7 +62,7 @@ jobs:
     needs: [mix_format, mix_credo, mix_test]
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-elixir@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -81,7 +81,7 @@ jobs:
     if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request' && github.base_ref == 'main'
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-elixir@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -100,7 +100,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-elixir@v1.0.0
+      - uses: erlef/setup-elixir@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"

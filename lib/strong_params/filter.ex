@@ -49,6 +49,27 @@ defmodule StrongParams.Filter do
     |> respond_reduce_with(params)
   end
 
+  defp reduce_function(filters, {%{}, params}, mode)
+       when is_list(filters) and is_list(params) do
+    params
+    |> Enum.reduce_while([], &reduce_params_list(&1, &2, filters, mode))
+    |> case do
+      list when is_list(list) -> Enum.reverse(list)
+      error -> error
+    end
+    |> respond_reduce_with(params)
+  end
+
+  defp reduce_function(filters, {%{}, params}, _mode) when is_list(filters),
+    do: {%Error{type: "type", errors: "Must be a list"}, params}
+
+  defp reduce_params_list(params, list, filters, mode) do
+    case apply_filters(%{}, filters, params, mode) do
+      %Error{} = error -> {:halt, error}
+      result -> {:cont, [result | list]}
+    end
+  end
+
   defp add_to_result(%Error{errors: errors} = error, key, :key_not_found, :required),
     do: %{error | errors: Map.put(errors, key, "is required")}
 

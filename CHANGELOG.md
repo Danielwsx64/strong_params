@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- Allow filter a list of parameters using a nested list filter.
+- Allow for filtering a list of parameters using a nested list filter.
 
 ## [0.0.4] - 2021-01-29
 

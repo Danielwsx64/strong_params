@@ -139,6 +139,40 @@ defmodule StrongParams.FilterTest do
              }
     end
 
+    test "parameters in list with nested maps" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "attachments" => [
+          %{
+            "name" => "doc.pdf",
+            "information" => %{
+              "type" => "jpg",
+              "size" => "23M",
+              "tags" => [
+                %{"title" => "important"}
+              ]
+            }
+          }
+        ]
+      }
+
+      filters = [
+        required: [:name, attachments: [[:name, information: [:type, :size, tags: [[:title]]]]]]
+      ]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %{
+               name: "Johnny Lawrence",
+               attachments: [
+                 %{
+                   name: "doc.pdf",
+                   information: %{size: "23M", tags: [%{title: "important"}], type: "jpg"}
+                 }
+               ]
+             }
+    end
+
     test "error in list item" do
       params = %{
         "name" => "Johnny Lawrence",

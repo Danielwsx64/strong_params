@@ -117,6 +117,91 @@ defmodule StrongParams.FilterTest do
              }
     end
 
+    test "parameters in list" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "attachments" => [
+          %{"name" => "file.jpg"},
+          %{"name" => "doc.pdf"}
+        ]
+      }
+
+      filters = [required: [:name, attachments: [[:name]]]]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %{
+               name: "Johnny Lawrence",
+               attachments: [
+                 %{name: "file.jpg"},
+                 %{name: "doc.pdf"}
+               ]
+             }
+    end
+
+    test "parameters in list with nested maps" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "attachments" => [
+          %{
+            "name" => "doc.pdf",
+            "information" => %{
+              "type" => "jpg",
+              "size" => "23M",
+              "tags" => [
+                %{"title" => "important"}
+              ]
+            }
+          }
+        ]
+      }
+
+      filters = [
+        required: [:name, attachments: [[:name, information: [:type, :size, tags: [[:title]]]]]]
+      ]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %{
+               name: "Johnny Lawrence",
+               attachments: [
+                 %{
+                   name: "doc.pdf",
+                   information: %{size: "23M", tags: [%{title: "important"}], type: "jpg"}
+                 }
+               ]
+             }
+    end
+
+    test "error in list item" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "attachments" => [
+          %{"other_key" => "file.jpg"},
+          %{"name" => "doc.pdf"}
+        ]
+      }
+
+      filters = [required: [:name, attachments: [[:name]]]]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %Error{
+               errors: %{attachments: %{name: "is required"}},
+               type: "required"
+             }
+    end
+
+    test "error when parameter isnt a list" do
+      params = %{"name" => "Johnny Lawrence", "attachments" => %{"other_key" => "file.jpg"}}
+
+      filters = [required: [:name, attachments: [[:name]]]]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %Error{errors: %{attachments: "Must be a list"}, type: "type"}
+    end
+
     test "return error for required field" do
       params = %{
         "name" => "Johnny Lawrence",

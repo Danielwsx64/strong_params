@@ -38,6 +38,23 @@ defmodule StrongParams do
      }
   }
   ```
+
+  For a list of params you must use a nested list
+
+  Exemple:
+
+  ```elixir
+  filter_for(:create, required: [:name, attachments: [[:name]]])
+
+  # Expected filtered parameters
+  %{
+     name: "Johnny Lawrence",
+     attachments: [
+       %{name: "file.jpg"},
+       %{name: "doc.pdf"}
+     ]
+   }
+  ```
   """
 
   @type parameters_list :: [atom | [{atom, parameters_list()}]]

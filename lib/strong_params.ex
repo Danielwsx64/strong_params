@@ -10,14 +10,14 @@ defmodule StrongParams do
   controller action. This macro must be called inside a Phoenix controller implementation.
 
   The first given argument must be a valid action name. The second must be a `Keyword`
-  with the list of required and permited parameters. The `Keyword` may have both lists or
+  with the list of required and permitted parameters. The `Keyword` may have both lists or
   just one of them:
 
-    * `:permited` - List of parameters to keep. If some of listed parameters is missing no error is returned.
+    * `:permitted` - List of parameters to keep. If some of listed parameters is missing no error is returned.
     * `:required` - List of parameters that are required. In case of missing parameters a error will be returned with a map enumerating the missing parameters.
 
   ```elixir
-  filter_for(:index, required: [:name, :email], permited: [:nickname])
+  filter_for(:index, required: [:name, :email], permitted: [:nickname])
   ```
 
   For nested parameters you must use a keyword.
@@ -25,7 +25,7 @@ defmodule StrongParams do
   Exemple:
 
   ```elixir
-  filter_for(:index, required: [:name, :email, address: [:street, :city]], permited: [:nickname])
+  filter_for(:index, required: [:name, :email, address: [:street, :city]], permitted: [:nickname])
 
   # Expected filtered parameters
   %{
@@ -59,9 +59,9 @@ defmodule StrongParams do
 
   @type parameters_list :: [atom | [{atom, parameters_list()}]]
   @type filters ::
-          [required: parameters_list, permited: parameters_list]
+          [required: parameters_list, permitted: parameters_list]
           | [required: parameters_list]
-          | [permited: parameters_list]
+          | [permitted: parameters_list]
 
   @spec filter_for(atom, filters()) :: any
   defmacro filter_for(filter_action, filters) do

@@ -19,14 +19,14 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "filter and return permited fields" do
+    test "filter and return permitted fields" do
       params = %{
         "name" => "Johnny Lawrence",
         "description" => "user description",
         "role" => "admin"
       }
 
-      result = Filter.apply(params, permited: [:name, :description])
+      result = Filter.apply(params, permitted: [:name, :description])
 
       assert result == %{
                name: "Johnny Lawrence",
@@ -34,14 +34,14 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "dont return error when permited field is not found" do
+    test "dont return error when permitted field is not found" do
       params = %{
         "name" => "Johnny Lawrence",
         "description" => "user description",
         "role" => "admin"
       }
 
-      result = Filter.apply(params, permited: [:nickname, :name, :description])
+      result = Filter.apply(params, permitted: [:nickname, :name, :description])
 
       assert result == %{
                name: "Johnny Lawrence",
@@ -71,7 +71,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "filter and return required and permited" do
+    test "filter and return required and permitted" do
       params = %{
         "name" => "Johnny Lawrence",
         "address" => %{
@@ -84,7 +84,7 @@ defmodule StrongParams.FilterTest do
 
       filters = [
         required: [:name, address: [:street]],
-        permited: [attachments: [info: [:type, :size]]]
+        permitted: [attachments: [info: [:type, :size]]]
       ]
 
       result = Filter.apply(params, filters)
@@ -96,7 +96,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "merge required and permited" do
+    test "merge required and permitted" do
       params = %{
         "name" => "Johnny Lawrence",
         "attachments" => %{
@@ -106,7 +106,7 @@ defmodule StrongParams.FilterTest do
 
       filters = [
         required: [:name, attachments: [info: [:type]]],
-        permited: [attachments: [info: [:size]]]
+        permitted: [attachments: [info: [:size]]]
       ]
 
       result = Filter.apply(params, filters)
@@ -171,6 +171,36 @@ defmodule StrongParams.FilterTest do
                  }
                ]
              }
+    end
+
+    test "when a permitted is a map and not given on params" do
+      params = %{"name" => "Johnny Lawrence"}
+
+      filters = [permitted: [:name, address: [:street, :city]]]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %{name: "Johnny Lawrence"}
+    end
+
+    test "when a permitted is a map and was given a nil on params" do
+      params = %{"name" => "Johnny Lawrence", "address" => nil}
+
+      filters = [permitted: [:name, address: [:street, :city]]]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %{name: "Johnny Lawrence", address: %{}}
+    end
+
+    test "when a permitted is a map and was given an empty map on params" do
+      params = %{"name" => "Johnny Lawrence", "address" => %{}}
+
+      filters = [permitted: [:name, address: [:street, :city]]]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %{name: "Johnny Lawrence", address: %{}}
     end
 
     test "error in list item" do
@@ -277,7 +307,7 @@ defmodule StrongParams.FilterTest do
       assert params_with_not_a_map_result == expected_error
     end
 
-    test "dont return permited when required has errors" do
+    test "dont return permitted when required has errors" do
       params = %{
         "name" => "Johnny Lawrence",
         "address" => %{
@@ -288,7 +318,7 @@ defmodule StrongParams.FilterTest do
         }
       }
 
-      filters = [required: [attachments: [info: [:type, :size]]], permited: [:name]]
+      filters = [required: [attachments: [info: [:type, :size]]], permitted: [:name]]
 
       result = Filter.apply(params, filters)
 

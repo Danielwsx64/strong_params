@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2021-07-08
+
+### Fix
+
+- typo `permited` -> `permitted`
+
+### Enhancements
+
+- Dont add a missing permitted key on filter results
+
 ## [0.0.5] - 2021-03-18
 
 ### Features
@@ -19,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add lib documentation
 
-[unreleased]: https://github.com/brainnco/strong_params/compare/v0.0.5...main
+[unreleased]: https://github.com/brainnco/strong_params/compare/v0.1.0...main
+[0.1.0]: https://github.com/brainnco/strong_params/compare/v0.0.5...v0.1.0
 [0.0.5]: https://github.com/brainnco/strong_params/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/brainnco/strong_params/compare/v0.0.3...v0.0.4

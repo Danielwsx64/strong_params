@@ -7,22 +7,22 @@ defmodule StrongParams.Filter do
 
   def apply(params, filters) do
     required = Keyword.get(filters, :required, [])
-    permited = Keyword.get(filters, :permited, [])
+    permitted = Keyword.get(filters, :permitted, [])
 
     required
     |> filter_required(params)
-    |> filter_permited(permited, params)
+    |> filter_permitted(permitted, params)
   end
 
   defp filter_required(required, params) do
     apply_filters(%{}, required, params, :required)
   end
 
-  defp filter_permited(%Error{} = error, _permited, _params), do: error
+  defp filter_permitted(%Error{} = error, _permitted, _params), do: error
 
-  defp filter_permited(initial, permited, params) do
+  defp filter_permitted(initial, permitted, params) do
     %{}
-    |> apply_filters(permited, params, :permited)
+    |> apply_filters(permitted, params, :permitted)
     |> deep_merge(initial)
   end
 
@@ -45,10 +45,13 @@ defmodule StrongParams.Filter do
 
     partial_result =
       case {params_value, mode} do
-        {:key_not_found, :permited} ->
+        {:key_not_found, :permitted} ->
           result
 
         {:key_not_found, :required} ->
+          add_to_result(result, filter, apply_filters(%{}, filter_rest, %{}, mode), mode)
+
+        {nil, _mode} ->
           add_to_result(result, filter, apply_filters(%{}, filter_rest, %{}, mode), mode)
 
         _other ->
@@ -85,7 +88,7 @@ defmodule StrongParams.Filter do
   defp add_to_result(%{}, key, :key_not_found, :required),
     do: %Error{type: "required", errors: Map.new([{key, "is required"}])}
 
-  defp add_to_result(result, _key, :key_not_found, :permited), do: result
+  defp add_to_result(result, _key, :key_not_found, :permitted), do: result
 
   defp add_to_result(%Error{errors: first_errors} = error, key, %Error{errors: errors}, _mode),
     do: %{error | errors: Map.put(first_errors, key, errors)}

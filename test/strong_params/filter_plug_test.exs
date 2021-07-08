@@ -6,7 +6,7 @@ defmodule StrongParams.FilterPlugTest do
 
   describe "init/1" do
     test "keep options" do
-      opts = [required: [:name], permited: [:alias], caller: :module]
+      opts = [required: [:name], permitted: [:alias], caller: :module]
 
       assert FilterPlug.init(opts) == opts
     end

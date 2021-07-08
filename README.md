@@ -64,7 +64,7 @@ defmodule YourPhoenixApp.UserController do
 
   alias YourPhoenixApp.User
 
-  filter_for(:create, required: [:name, :email], permited: [:nickname])
+  filter_for(:create, required: [:name, :email], permitted: [:nickname])
 
   def create(conn, %{name: _, email: _} = params) do
 
@@ -92,7 +92,7 @@ defmodule YourPhoenixApp.UserController do
 
   action_fallback(YourPhoenixApp.Fallback)
 
-  filter_for(:create, required: [:name, :email], permited: [:nickname])
+  filter_for(:create, required: [:name, :email], permitted: [:nickname])
 
   ...
 
@@ -111,8 +111,8 @@ end
 You must call `filter_for/2` for each action you want to filter the params.
 
 ```elixir
-filter_for(:create, required: [:name, :email], permited: [:nickname])
-filter_for(:update, permited: [:name, :email, :nickname])
+filter_for(:create, required: [:name, :email], permitted: [:nickname])
+filter_for(:update, permitted: [:name, :email, :nickname])
 ```
 
 ## Contributing

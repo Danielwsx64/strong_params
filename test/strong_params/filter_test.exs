@@ -173,6 +173,16 @@ defmodule StrongParams.FilterTest do
              }
     end
 
+    test "when a permited is a map and not given on params" do
+      params = %{"name" => "Johnny Lawrence"}
+
+      filters = [permited: [:name, address: [:street, :city]]]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %{name: "Johnny Lawrence"}
+    end
+
     test "error in list item" do
       params = %{
         "name" => "Johnny Lawrence",

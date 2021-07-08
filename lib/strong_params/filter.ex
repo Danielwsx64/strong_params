@@ -41,12 +41,21 @@ defmodule StrongParams.Filter do
   end
 
   defp reduce_function({filter, filter_rest}, {result, params}, mode) when is_atom(filter) do
-    params_value = get(params, to_string(filter), %{})
-    filtered = apply_filters(%{}, filter_rest, params_value, mode)
+    params_value = get(params, to_string(filter), :key_not_found)
 
-    result
-    |> add_to_result(filter, filtered, mode)
-    |> respond_reduce_with(params)
+    partial_result =
+      case {params_value, mode} do
+        {:key_not_found, :permited} ->
+          result
+
+        {:key_not_found, :required} ->
+          add_to_result(result, filter, apply_filters(%{}, filter_rest, %{}, mode), mode)
+
+        _other ->
+          add_to_result(result, filter, apply_filters(%{}, filter_rest, params_value, mode), mode)
+      end
+
+    respond_reduce_with(partial_result, params)
   end
 
   defp reduce_function(filters, {%{}, params}, mode)

@@ -19,6 +19,39 @@ defmodule StrongParams.FilterTest do
              }
     end
 
+    test "cast types" do
+      params = %{
+        "id" => "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
+        "date" => "2021-11-29"
+      }
+
+      result = Filter.apply(params, required: [{:id, Ecto.UUID}, {:date, :date}])
+
+      assert result == %{
+               id: "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
+               date: ~D[2021-11-29]
+             }
+    end
+
+    test "cast errors" do
+      params = %{
+        "id" => "invalid",
+        "date" => "invalid"
+      }
+
+      result = Filter.apply(params, required: [{:id, Ecto.UUID}, {:date, :date}])
+
+      assert result == %Error{errors: %{date: "is invalid", id: "is invalid"}, type: "invalid"}
+    end
+
+    test "cast on missing keys" do
+      params = %{}
+
+      result = Filter.apply(params, permitted: [{:date, :date}])
+
+      assert result == %{}
+    end
+
     test "filter and return permitted fields" do
       params = %{
         "name" => "Johnny Lawrence",
@@ -56,18 +89,34 @@ defmodule StrongParams.FilterTest do
           "street" => "First Avenue"
         },
         "attachments" => %{
-          "info" => %{"type" => "jpg"}
+          "info" => %{
+            "type" => "jpg",
+            "id" => "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
+            "date" => "2021-11-29"
+          }
         }
       }
 
-      filters = [required: [:name, address: [:street], attachments: [info: [:type]]]]
+      filters = [
+        required: [
+          :name,
+          address: [:street],
+          attachments: [info: [{:id, Ecto.UUID}, {:date, :date}, :type]]
+        ]
+      ]
 
       result = Filter.apply(params, filters)
 
       assert result == %{
                name: "Johnny Lawrence",
                address: %{street: "First Avenue"},
-               attachments: %{info: %{type: "jpg"}}
+               attachments: %{
+                 info: %{
+                   type: "jpg",
+                   id: "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
+                   date: ~D[2021-11-29]
+                 }
+               }
              }
     end
 
@@ -257,12 +306,17 @@ defmodule StrongParams.FilterTest do
           "street" => "First Avenue"
         },
         "attachments" => %{
-          "info" => %{"type" => "jpg"}
+          "info" => %{"type" => "jpg", "date" => "invalid"}
         }
       }
 
       filters = [
-        required: [:name, :nickname, address: [:city], attachments: [info: [:type, :size]]]
+        required: [
+          :name,
+          :nickname,
+          address: [:city],
+          attachments: [info: [:type, :size, {:date, :date}]]
+        ]
       ]
 
       result = Filter.apply(params, filters)
@@ -270,7 +324,7 @@ defmodule StrongParams.FilterTest do
       assert result == %Error{
                type: "required",
                errors: %{
-                 attachments: %{info: %{size: "is required"}},
+                 attachments: %{info: %{size: "is required", date: "is invalid"}},
                  address: %{city: "is required"},
                  nickname: "is required"
                }

@@ -110,7 +110,7 @@ defmodule StrongParams.Filter do
   defp add_to_result(%{}, key, :invalid_value, _mode),
     do: %Error{type: "invalid", errors: Map.new([{key, "is invalid"}])}
 
-  defp add_to_result(result, _key, :key_not_found, :permitted), do: result
+  defp add_to_result(result, _key, :invalid_value, _mode), do: result
 
   defp add_to_result(%Error{errors: first_errors} = error, key, %Error{errors: errors}, _mode),
     do: %{error | errors: Map.put(first_errors, key, errors)}

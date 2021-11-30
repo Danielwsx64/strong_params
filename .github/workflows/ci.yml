@@ -9,10 +9,10 @@ on:
 jobs:
   mix_format:
     name: mix format (Elixir 1.10.2 OTP 22.3)
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: erlef/setup-elixir@v1
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -22,10 +22,10 @@ jobs:
         run: mix format --check-formatted
   mix_credo:
     name: mix credo (Elixir 1.10.2 OTP 22.3)
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: erlef/setup-elixir@v1
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -45,10 +45,10 @@ jobs:
             otp: "22.1.8"
           - elixir: "1.10.2"
             otp: "22.3"
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: erlef/setup-elixir@v1
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
@@ -58,11 +58,11 @@ jobs:
         run: mix test
   coverage:
     name: Check coverage
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [mix_format, mix_credo, mix_test]
     steps:
       - uses: actions/checkout@v1
-      - uses: erlef/setup-elixir@v1
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -76,12 +76,12 @@ jobs:
         run: bash <(curl -s https://codecov.io/bash)
   mix_check_version:
     name: Check version (Elixir 1.10.2 OTP 22.3)
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [mix_format, mix_credo, mix_test]
     if: github.ref != 'refs/heads/main' && github.event_name == 'pull_request' && github.base_ref == 'main'
     steps:
       - uses: actions/checkout@v1
-      - uses: erlef/setup-elixir@v1
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -93,14 +93,14 @@ jobs:
         run: mix run bin/check_version.exs
   mix_publish:
     name: Publish (Elixir 1.10.2 OTP 22.3)
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [mix_format, mix_credo, mix_test]
     outputs:
       version: ${{ steps.output_version.outputs.version }}
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v1
-      - uses: erlef/setup-elixir@v1
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: "22.3"
           elixir-version: "1.10.2"
@@ -115,7 +115,7 @@ jobs:
         id: output_version
   github_release:
     name: Create release
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     needs: [mix_publish]
     if: github.ref == 'refs/heads/main'
     steps:

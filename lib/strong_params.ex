@@ -41,7 +41,7 @@ defmodule StrongParams do
 
   For a list of params you must use a nested list
 
-  Exemple:
+  Example:
 
   ```elixir
   filter_for(:create, required: [:name, attachments: [[:name]]])
@@ -55,6 +55,35 @@ defmodule StrongParams do
      ]
    }
   ```
+
+  ## Cast value
+
+  `Ecto.Type` is used to the casting, so `ecto` needs to be
+  available as a dependency in your app.
+
+  Add to your `mix.exs`.
+
+  ```elixir
+  {:ecto, "~> x.x"}
+  ```
+
+  To cast values you must provide a tuple {field, type}
+
+  Example:
+
+  ```elixir
+  filter_for(:create, required: [{:id, Ecto.UUID}, {:date, {:array, :date}}])
+
+  # Expected filtered parameters
+  %{
+     id: "11268bd3-5e41-4e6f-bf28-f3e167f87767",
+     dates: [~D[2021-11-29], ~D[2021-11-30]]
+   }
+  ```
+
+  Any custom `Ecto.Type` or [ecto primitive types](https://hexdocs.pm/ecto/Ecto.Schema.html#module-primitive-types)
+  are valid types.
+
   """
 
   @type parameters_list :: [atom | [{atom, parameters_list()}]]

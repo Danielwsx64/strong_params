@@ -1,7 +1,7 @@
 defmodule StrongParams.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
   @description "Filter request parameters in a Phoenix app"
   @links %{"GitHub" => "https://github.com/brainnco/strong_params"}
 
@@ -43,6 +43,7 @@ defmodule StrongParams.MixProject do
     [
       {:deep_merge, " ~> 1.0"},
       {:plug, " ~> 1.11"},
+      {:ecto, "~> 3.7", optional: true},
 
       # Dev/Test dependencies
 

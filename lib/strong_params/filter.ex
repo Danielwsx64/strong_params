@@ -5,6 +5,8 @@ defmodule StrongParams.Filter do
 
   alias StrongParams.Error
 
+  defguardp is_cast_type(type) when is_atom(type) or is_tuple(type)
+
   def apply(params, filters) do
     required = Keyword.get(filters, :required, [])
     permitted = Keyword.get(filters, :permitted, [])
@@ -37,6 +39,18 @@ defmodule StrongParams.Filter do
 
     result
     |> add_to_result(filter, params_value, mode)
+    |> respond_reduce_with(params)
+  end
+
+  defp reduce_function({filter, type}, {result, params}, mode)
+       when is_atom(filter) and is_cast_type(type) do
+    casted_value =
+      params
+      |> get(to_string(filter), :key_not_found)
+      |> cast_value(type)
+
+    result
+    |> add_to_result(filter, casted_value, mode)
     |> respond_reduce_with(params)
   end
 
@@ -90,6 +104,12 @@ defmodule StrongParams.Filter do
 
   defp add_to_result(result, _key, :key_not_found, :permitted), do: result
 
+  defp add_to_result(%Error{errors: errors} = error, key, :invalid_value, _mode),
+    do: %{error | errors: Map.put(errors, key, "is invalid")}
+
+  defp add_to_result(%{}, key, :invalid_value, _mode),
+    do: %Error{type: "invalid", errors: Map.new([{key, "is invalid"}])}
+
   defp add_to_result(%Error{errors: first_errors} = error, key, %Error{errors: errors}, _mode),
     do: %{error | errors: Map.put(first_errors, key, errors)}
 
@@ -100,4 +120,26 @@ defmodule StrongParams.Filter do
   defp add_to_result(%{} = result, key, value, _mode), do: put_new(result, key, value)
 
   defp respond_reduce_with(result, params), do: {result, params}
+
+  defp cast_value(:key_not_found, _type), do: :key_not_found
+
+  if Code.ensure_loaded?(Ecto) do
+    defp cast_value(value, type) do
+      case Ecto.Type.cast(type, value) do
+        {:ok, casted_value} -> casted_value
+        :error -> :invalid_value
+      end
+    end
+  else
+    defp cast_value(_value, _type) do
+      raise ArgumentError, """
+      In order to cast a value you need to have ecto available as a dependency.
+
+      Please add :ecto to your dependencies:
+
+        {:ecto, "~> x.x"}
+
+      """
+    end
+  end
 end

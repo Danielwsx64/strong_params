@@ -72,12 +72,12 @@ defmodule StrongParams do
   Example:
 
   ```elixir
-  filter_for(:create, required: [{:id, Ecto.UUID}, {:date, :date}])
+  filter_for(:create, required: [{:id, Ecto.UUID}, {:date, {:array, :date}}])
 
   # Expected filtered parameters
   %{
      id: "11268bd3-5e41-4e6f-bf28-f3e167f87767",
-     date: ~D[2021-11-29]
+     dates: [~D[2021-11-29], ~D[2021-11-30]]
    }
   ```
 

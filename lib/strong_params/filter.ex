@@ -5,6 +5,8 @@ defmodule StrongParams.Filter do
 
   alias StrongParams.Error
 
+  defguardp is_cast_type(type) when is_atom(type) or is_tuple(type)
+
   def apply(params, filters) do
     required = Keyword.get(filters, :required, [])
     permitted = Keyword.get(filters, :permitted, [])
@@ -41,7 +43,7 @@ defmodule StrongParams.Filter do
   end
 
   defp reduce_function({filter, type}, {result, params}, mode)
-       when is_atom(filter) and is_atom(type) do
+       when is_atom(filter) and is_cast_type(type) do
     casted_value =
       params
       |> get(to_string(filter), :key_not_found)

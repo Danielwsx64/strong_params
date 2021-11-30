@@ -22,14 +22,14 @@ defmodule StrongParams.FilterTest do
     test "cast types" do
       params = %{
         "id" => "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
-        "date" => "2021-11-29"
+        "dates" => ["2021-11-29", "2021-10-30"]
       }
 
-      result = Filter.apply(params, required: [{:id, Ecto.UUID}, {:date, :date}])
+      result = Filter.apply(params, required: [{:id, Ecto.UUID}, {:dates, {:array, :date}}])
 
       assert result == %{
                id: "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
-               date: ~D[2021-11-29]
+               dates: [~D[2021-11-29], ~D[2021-10-30]]
              }
     end
 

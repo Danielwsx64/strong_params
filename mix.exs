@@ -41,7 +41,6 @@ defmodule StrongParams.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:deep_merge, " ~> 1.0"},
       {:plug, " ~> 1.11"},
       {:ecto, "~> 3.7", optional: true},
 

@@ -1,7 +1,6 @@
 defmodule StrongParams.Filter do
   @moduledoc false
   import Map, only: [put_new: 3, get: 3]
-  import DeepMerge, only: [deep_merge: 2]
 
   alias StrongParams.Error
 
@@ -33,6 +32,22 @@ defmodule StrongParams.Filter do
 
     result
   end
+
+  defp deep_merge(original, override) when is_map(original) and is_map(override) do
+    Map.merge(original, override, &resolve_conflict/3)
+  end
+
+  defp resolve_conflict(_key, original, override) when is_map(original) and is_map(override) do
+    deep_merge(original, override)
+  end
+
+  defp resolve_conflict(_key, original, override) when is_list(original) and is_list(override) do
+    original
+    |> Enum.zip(override)
+    |> Enum.map(fn {left, right} -> deep_merge(left, right) end)
+  end
+
+  defp resolve_conflict(_key, _original, override), do: override
 
   defp reduce_function(filter, {result, params}, mode) when is_atom(filter) do
     params_value = get(params, to_string(filter), :key_not_found)

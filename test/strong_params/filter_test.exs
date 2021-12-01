@@ -166,6 +166,42 @@ defmodule StrongParams.FilterTest do
              }
     end
 
+    test "merge required and permitted in nested lists" do
+      params = %{
+        "deep" => [
+          %{
+            "update" => [
+              %{
+                "description" => "desc 1"
+              },
+              %{
+                "description" => "desc 2",
+                "attachments_ids" => ["id 1", "id 2"]
+              }
+            ]
+          }
+        ]
+      }
+
+      filters = [
+        required: [deep: [[update: [[:description]]]]],
+        permitted: [deep: [[update: [[:attachments_ids]]]]]
+      ]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %{
+               deep: [
+                 %{
+                   update: [
+                     %{description: "desc 1"},
+                     %{description: "desc 2", attachments_ids: ["id 1", "id 2"]}
+                   ]
+                 }
+               ]
+             }
+    end
+
     test "parameters in list" do
       params = %{
         "name" => "Johnny Lawrence",

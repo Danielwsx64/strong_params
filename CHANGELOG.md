@@ -41,9 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add lib documentation
 
-[unreleased]: https://github.com/brainnco/strong_params/compare/v0.2.1...main
-[0.2.1]: https://github.com/brainnco/strong_params/compare/v0.2.0...v0.2.1
-[0.2.0]: https://github.com/brainnco/strong_params/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/brainnco/strong_params/compare/v0.0.5...v0.1.0
-[0.0.5]: https://github.com/brainnco/strong_params/compare/v0.0.4...v0.0.5
-[0.0.4]: https://github.com/brainnco/strong_params/compare/v0.0.3...v0.0.4
+[unreleased]: https://github.com/Finbits/strong_params/compare/v0.2.1...main
+[0.2.1]: https://github.com/Finbits/strong_params/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/Finbits/strong_params/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/Finbits/strong_params/compare/v0.0.5...v0.1.0
+[0.0.5]: https://github.com/Finbits/strong_params/compare/v0.0.4...v0.0.5
+[0.0.4]: https://github.com/Finbits/strong_params/compare/v0.0.3...v0.0.4

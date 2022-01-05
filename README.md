@@ -1,10 +1,10 @@
 # StrongParams
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/brainnco/strong_params/CI?style=flat-square)](https://github.com/brainnco/strong_params/actions?query=workflow%3ACI)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Finbits/strong_params/CI?style=flat-square)](https://github.com/Finbits/strong_params/actions?query=workflow%3ACI)
 [![Hex.pm](https://img.shields.io/hexpm/v/strong_params?style=flat-square)](https://hex.pm/packages/strong_params)
 [![Hex.pm](https://img.shields.io/hexpm/l/strong_params?style=flat-square)](https://hex.pm/packages/strong_params)
 [![Hex.pm](https://img.shields.io/hexpm/dt/strong_params?style=flat-square)](https://hex.pm/packages/strong_params)
-[![codecov](https://img.shields.io/codecov/c/github/brainnco/strong_params?style=flat-square)](https://codecov.io/gh/brainnco/strong_params)
+[![codecov](https://img.shields.io/codecov/c/github/Finbits/strong_params?style=flat-square)](https://codecov.io/gh/Finbits/strong_params)
 
 Inspired by Ruby on Rails Strong Parameters. It filters request params keeping only explicitly enumerated parameters.
 
@@ -121,4 +121,4 @@ filter_for(:update, permitted: [:name, :email, :nickname])
 
 ## License
 
-[Apache License, Version 2.0](LICENSE) © [brainn.co](https://github.com/brainn-co)
+[Apache License, Version 2.0](LICENSE) © [Finbits](https://github.com/Finbits)

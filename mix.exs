@@ -3,7 +3,7 @@ defmodule StrongParams.MixProject do
 
   @version "0.2.1"
   @description "Filter request parameters in a Phoenix app"
-  @links %{"GitHub" => "https://github.com/brainnco/strong_params"}
+  @links %{"GitHub" => "https://github.com/Finbits/strong_params"}
 
   def project do
     [

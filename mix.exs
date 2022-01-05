@@ -1,7 +1,7 @@
 defmodule StrongParams.MixProject do
   use Mix.Project
 
-  @version "0.2.1"
+  @version "0.2.2"
   @description "Filter request parameters in a Phoenix app"
   @links %{"GitHub" => "https://github.com/Finbits/strong_params"}
 

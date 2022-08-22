@@ -417,5 +417,21 @@ defmodule StrongParams.FilterTest do
                errors: %{attachments: %{info: %{size: "is required"}}}
              }
     end
+
+    test "returns error when has required filters and it was given an empty list as params" do
+      params = %{"attachments" => []}
+
+      filters = [
+        required: [attachments: [[:info, address: [:street, :city]]]],
+        permitted: [attachments: [[:name]]]
+      ]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %StrongParams.Error{
+               errors: %{attachments: %{address: "is required", info: "is required"}},
+               type: "required"
+             }
+    end
   end
 end

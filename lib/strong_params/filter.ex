@@ -90,6 +90,12 @@ defmodule StrongParams.Filter do
     respond_reduce_with(partial_result, params)
   end
 
+  defp reduce_function(filters, {%{}, [] = params}, :required) when is_list(filters) do
+    filters
+    |> Enum.reduce(%{}, &reduce_empty_required_list/2)
+    |> respond_reduce_with(params)
+  end
+
   defp reduce_function(filters, {%{}, params}, mode)
        when is_list(filters) and is_list(params) do
     params
@@ -109,6 +115,14 @@ defmodule StrongParams.Filter do
       %Error{} = error -> {:halt, error}
       result -> {:cont, [result | list]}
     end
+  end
+
+  defp reduce_empty_required_list(key, acc) when is_atom(key) do
+    add_to_result(acc, key, :key_not_found, :required)
+  end
+
+  defp reduce_empty_required_list({key, _value}, acc) when is_atom(key) do
+    reduce_empty_required_list(key, acc)
   end
 
   defp add_to_result(%Error{errors: errors} = error, key, :key_not_found, :required),

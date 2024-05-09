@@ -47,8 +47,8 @@ defmodule StrongParams.MixProject do
       # Dev/Test dependencies
 
       {:credo, "~> 1.5", only: [:dev, :test]},
-      {:ex_doc, "~> 0.23.0", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.13.4", only: [:dev, :test]},
+      {:ex_doc, "~> 0.32", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.18", only: [:dev, :test]},
       {:json, "~> 1.2", only: [:dev, :test]},
       {:phoenix, " ~> 1.5", only: :test}
     ]

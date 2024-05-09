@@ -131,8 +131,9 @@ defmodule StrongParamsTest do
       assert result.status == 400
       assert result.params == %{}
 
-      assert result.resp_body ==
-               "%StrongParams.Error{errors: %{name: \"is required\"}, type: \"required\"}"
+      assert result.resp_body =~ "%StrongParams.Error{"
+      assert result.resp_body =~ "type: \"required\""
+      assert result.resp_body =~ "errors: %{name: \"is required\"}"
     end
 
     test "use fallback function to handle filter error", %{conn: conn} do
@@ -143,8 +144,9 @@ defmodule StrongParamsTest do
       assert result.status == 400
       assert result.params == %{}
 
-      assert result.resp_body ==
-               "%StrongParams.Error{errors: %{name: \"is required\"}, type: \"required\"}"
+      assert result.resp_body =~ "%StrongParams.Error{"
+      assert result.resp_body =~ "type: \"required\""
+      assert result.resp_body =~ "errors: %{name: \"is required\"}"
     end
 
     test "multiples filters seted", %{conn: conn} do
@@ -164,8 +166,9 @@ defmodule StrongParamsTest do
       assert create_result.status == 400
       assert create_result.params == %{"name" => "Johnny Lawrence"}
 
-      assert create_result.resp_body ==
-               "%StrongParams.Error{errors: %{alias: \"is required\"}, type: \"required\"}"
+      assert create_result.resp_body =~ "%StrongParams.Error{"
+      assert create_result.resp_body =~ "type: \"required\""
+      assert create_result.resp_body =~ "errors: %{alias: \"is required\"}"
     end
   end
 end

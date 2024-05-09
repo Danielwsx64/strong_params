@@ -2,17 +2,24 @@ defmodule StrongParams.Filter do
   @moduledoc false
   import Map, only: [put_new: 3, get: 3]
 
+  alias Decimal.Error
   alias StrongParams.Error
 
   defguardp is_cast_type(type) when is_atom(type) or is_tuple(type)
 
+  @forbidden_msg "is not a valid parameter"
+  @invalid_msg "is invalid"
+  @required_msg "is required"
+
   def apply(params, filters) do
     required = Keyword.get(filters, :required, [])
     permitted = Keyword.get(filters, :permitted, [])
+    must_check_forbidden = Keyword.get(filters, :forbidden_params_err, false)
 
     required
     |> filter_required(params)
     |> filter_permitted(permitted, params)
+    |> check_forbidden_params(params, must_check_forbidden)
   end
 
   defp filter_required(required, params) do
@@ -26,6 +33,83 @@ defmodule StrongParams.Filter do
     |> apply_filters(permitted, params, :permitted)
     |> deep_merge(initial)
   end
+
+  ### ===== Begining
+
+  defp check_forbidden_params(filtered, params, true = _must_check_fbdn)
+       when not is_struct(filtered) do
+    case check_forbidden(:ok, params, filtered) do
+      :ok -> filtered
+      error -> error
+    end
+  end
+
+  defp check_forbidden_params(result, _params, _must_check_fbdn), do: result
+
+  defp check_forbidden(previous_err, params, filtered) do
+    Enum.reduce(params, previous_err, fn {key, value}, err_acc ->
+      case(fetch_key_value(key, filtered)) do
+        {:ok, filtered_value} -> deep_check_forbidden(err_acc, value, filtered_value, key)
+        :error -> add_forbidden_error(err_acc, key)
+      end
+    end)
+  end
+
+  defp deep_check_forbidden(previous_err, params, filtered, key) when is_map(params) do
+    case check_forbidden(:ok, params, filtered) do
+      :ok -> previous_err
+      new_error -> add_forbidden_error(previous_err, key, new_error)
+    end
+  end
+
+  defp deep_check_forbidden(previous_err, [head | _tail] = params_list, filtered, key)
+       when is_map(head) do
+    params_list
+    |> Enum.with_index()
+    |> Enum.reduce(:ok, fn {params, index}, acc ->
+      check_forbidden(acc, params, Enum.at(filtered, index))
+    end)
+    |> case do
+      :ok -> previous_err
+      new_error -> add_forbidden_error(previous_err, key, new_error)
+    end
+  end
+
+  defp deep_check_forbidden(previous_err, _params, _filtered, _key), do: previous_err
+
+  defp fetch_key_value(key, filtered) do
+    with {:ok, key_as_atom} <- to_existing_atom(key) do
+      Map.fetch(filtered, key_as_atom)
+    end
+  end
+
+  defp to_existing_atom(string) do
+    {:ok, String.to_existing_atom(string)}
+  rescue
+    _any -> :error
+  end
+
+  defp add_forbidden_error(previous, key, new_err \\ nil)
+
+  defp add_forbidden_error(:ok = _previous, key, nil) do
+    %Error{type: "forbidden", errors: %{key => @forbidden_msg}}
+  end
+
+  defp add_forbidden_error(%Error{errors: errors} = error, key, nil) do
+    %{error | errors: Map.put(errors, key, @forbidden_msg)}
+  end
+
+  defp add_forbidden_error(previous, _key, :ok), do: previous
+
+  defp add_forbidden_error(:ok, key, %Error{errors: errors}) do
+    %Error{type: "forbidden", errors: %{key => errors}}
+  end
+
+  defp add_forbidden_error(%Error{errors: parent_errors} = error, key, %Error{errors: errors}) do
+    %{error | errors: Map.put(parent_errors, key, errors)}
+  end
+
+  ### ===== END
 
   defp apply_filters(initial, filters, params, mode) do
     {result, _params} = Enum.reduce(filters, {initial, params}, &reduce_function(&1, &2, mode))
@@ -125,28 +209,34 @@ defmodule StrongParams.Filter do
     reduce_empty_required_list(key, acc)
   end
 
-  defp add_to_result(%Error{errors: errors} = error, key, :key_not_found, :required),
-    do: %{error | errors: Map.put(errors, key, "is required")}
+  defp add_to_result(%Error{errors: errors} = error, key, :key_not_found, :required) do
+    %{error | errors: Map.put(errors, key, @required_msg)}
+  end
 
-  defp add_to_result(%{}, key, :key_not_found, :required),
-    do: %Error{type: "required", errors: Map.new([{key, "is required"}])}
+  defp add_to_result(_result, key, :key_not_found, :required) do
+    %Error{type: "required", errors: Map.new([{key, @required_msg}])}
+  end
 
   defp add_to_result(result, _key, :key_not_found, :permitted), do: result
 
-  defp add_to_result(%Error{errors: errors} = error, key, :invalid_value, _mode),
-    do: %{error | errors: Map.put(errors, key, "is invalid")}
+  defp add_to_result(%Error{errors: errors} = error, key, :invalid_value, _mode) do
+    %{error | errors: Map.put(errors, key, @invalid_msg)}
+  end
 
-  defp add_to_result(%{}, key, :invalid_value, _mode),
-    do: %Error{type: "invalid", errors: Map.new([{key, "is invalid"}])}
+  defp add_to_result(_result, key, :invalid_value, _mode) do
+    %Error{type: "invalid", errors: Map.new([{key, @invalid_msg}])}
+  end
 
-  defp add_to_result(%Error{errors: first_errors} = error, key, %Error{errors: errors}, _mode),
-    do: %{error | errors: Map.put(first_errors, key, errors)}
+  defp add_to_result(%Error{errors: first_errors} = error, key, %Error{errors: errors}, _mode) do
+    %{error | errors: Map.put(first_errors, key, errors)}
+  end
 
-  defp add_to_result(%{}, key, %Error{errors: errors} = error, _mode),
-    do: %{error | errors: Map.new([{key, errors}])}
+  defp add_to_result(_result, key, %Error{errors: errors} = error, _mode) do
+    %{error | errors: Map.new([{key, errors}])}
+  end
 
   defp add_to_result(%Error{} = error, _key, _value, _mode), do: error
-  defp add_to_result(%{} = result, key, value, _mode), do: put_new(result, key, value)
+  defp add_to_result(result, key, value, _mode), do: put_new(result, key, value)
 
   defp respond_reduce_with(result, params), do: {result, params}
 

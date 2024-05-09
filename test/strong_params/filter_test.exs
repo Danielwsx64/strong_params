@@ -1,7 +1,8 @@
 defmodule StrongParams.FilterTest do
   use ExUnit.Case, async: true
 
-  alias StrongParams.{Error, Filter}
+  alias StrongParams.Error
+  alias StrongParams.Filter
 
   describe "apply/3" do
     test "filter and return required fields" do
@@ -30,6 +31,24 @@ defmodule StrongParams.FilterTest do
       assert result == %{
                id: "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
                dates: [~D[2021-11-29], ~D[2021-10-30]]
+             }
+    end
+
+    test "success with the forbidden error opt as true" do
+      params = %{
+        "id" => "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
+        "dates" => ["2021-11-29"]
+      }
+
+      result =
+        Filter.apply(params,
+          required: [{:id, Ecto.UUID}, {:dates, {:array, :date}}],
+          forbidden_params_err: true
+        )
+
+      assert result == %{
+               id: "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
+               dates: [~D[2021-11-29]]
              }
     end
 
@@ -432,6 +451,198 @@ defmodule StrongParams.FilterTest do
                errors: %{attachments: %{address: "is required", info: "is required"}},
                type: "required"
              }
+    end
+
+    test "return error for forbidden params when opt is given" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "description" => "user description",
+        "role" => "admin"
+      }
+
+      result = Filter.apply(params, required: [:name, :description], forbidden_params_err: true)
+
+      assert result == %Error{type: "forbidden", errors: %{"role" => "is not a valid parameter"}}
+    end
+
+    test "return error for forbidden params when opt is given (multiple errors)" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "description" => "user description",
+        "role" => "admin"
+      }
+
+      result = Filter.apply(params, required: [:name], forbidden_params_err: true)
+
+      assert result == %Error{
+               type: "forbidden",
+               errors: %{
+                 "role" => "is not a valid parameter",
+                 "description" => "is not a valid parameter"
+               }
+             }
+    end
+
+    test "return error for forbidden params when opt is given (with nested params)" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "address" => %{
+          "street" => "First Avenue"
+        },
+        "attachments" => %{
+          "info" => %{
+            "type" => "jpg",
+            "id" => "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
+            "date" => "2021-11-29"
+          }
+        }
+      }
+
+      filters = [
+        required: [
+          :name,
+          address: [:street],
+          attachments: [info: [:date, :type]]
+        ],
+        forbidden_params_err: true
+      ]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %Error{
+               type: "forbidden",
+               errors: %{"attachments" => %{"info" => %{"id" => "is not a valid parameter"}}}
+             }
+    end
+
+    test "return error for forbidden params when opt is given (multiple errors and nested params)" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "address" => %{
+          "street" => "First Avenue"
+        },
+        "attachments" => %{
+          "info" => %{
+            "type" => "jpg",
+            "id" => "6bb35d22-9c97-4f1f-baf5-2caf0bab9110",
+            "date" => "2021-11-29"
+          }
+        }
+      }
+
+      filters = [
+        required: [
+          address: [:street],
+          attachments: [info: [:date]]
+        ],
+        forbidden_params_err: true
+      ]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %Error{
+               type: "forbidden",
+               errors: %{
+                 "attachments" => %{
+                   "info" => %{
+                     "id" => "is not a valid parameter",
+                     "type" => "is not a valid parameter"
+                   }
+                 },
+                 "name" => "is not a valid parameter"
+               }
+             }
+    end
+
+    test "return error for forbidden params when opt is given (when parameters has lists)" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "attachments" => [
+          %{
+            "name" => "doc.pdf",
+            "information" => %{
+              "type" => "jpg",
+              "size" => "23M",
+              "tags" => [
+                %{"title" => "important"},
+                %{"title" => "important", "deleted" => true}
+              ]
+            }
+          }
+        ]
+      }
+
+      filters = [
+        required: [:name, attachments: [[:name, information: [:type, :size, tags: [[:title]]]]]],
+        forbidden_params_err: true
+      ]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %Error{
+               type: "forbidden",
+               errors: %{
+                 "attachments" => %{
+                   "information" => %{"tags" => %{"deleted" => "is not a valid parameter"}}
+                 }
+               }
+             }
+    end
+
+    test "return error for forbidden params when opt is given (when parameters has lists with multiple errors)" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "attachments" => [
+          %{
+            "name" => "doc.pdf",
+            "extension" => "pdf",
+            "information" => %{
+              "type" => "jpg",
+              "size" => "23M",
+              "tags" => [
+                %{"title" => "important"},
+                %{"title" => "language", "deleted" => true},
+                %{"title" => "marketing", "deleted" => true, "root" => true}
+              ]
+            }
+          }
+        ]
+      }
+
+      filters = [
+        required: [attachments: [[:name, information: [:type, :size, tags: [[:title]]]]]],
+        forbidden_params_err: true
+      ]
+
+      result = Filter.apply(params, filters)
+
+      assert result == %Error{
+               type: "forbidden",
+               errors: %{
+                 "name" => "is not a valid parameter",
+                 "attachments" => %{
+                   "extension" => "is not a valid parameter",
+                   "information" => %{
+                     "tags" => %{
+                       "deleted" => "is not a valid parameter",
+                       "root" => "is not a valid parameter"
+                     }
+                   }
+                 }
+               }
+             }
+    end
+
+    test "when forbidden_params_err is true but filter already failed" do
+      params = %{
+        "name" => "Johnny Lawrence",
+        "description" => "user description",
+        "role" => "admin"
+      }
+
+      result = Filter.apply(params, required: [:name, :last_name], forbidden_params_err: true)
+
+      assert result == %Error{type: "required", errors: %{last_name: "is required"}}
     end
   end
 end

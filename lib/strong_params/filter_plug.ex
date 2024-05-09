@@ -21,8 +21,7 @@ defmodule StrongParams.FilterPlug do
   defp update_conn(%Error{} = error, conn, opts) do
     caller = Keyword.get(opts, :caller)
 
-    caller
-    |> apply(:__info__, [:attributes])
+    caller.__info__(:attributes)
     |> Keyword.get(:strong_params_controller_fallback, [:unregistered])
     |> case do
       [:unregistered] ->

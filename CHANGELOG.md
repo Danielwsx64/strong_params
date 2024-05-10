@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - 2024-05-10
 
+### Added
+
+- Add option to return error for forbidden parameters
+
 ## [0.2.3] - 2022-08-22
 
 ### Fix

@@ -2,7 +2,6 @@ defmodule StrongParams.Filter do
   @moduledoc false
   import Map, only: [put_new: 3, get: 3]
 
-  alias Decimal.Error
   alias StrongParams.Error
 
   defguardp is_cast_type(type) when is_atom(type) or is_tuple(type)
@@ -34,13 +33,9 @@ defmodule StrongParams.Filter do
     |> deep_merge(initial)
   end
 
-  ### ===== Begining
-
-  defp check_forbidden_params(filtered, params, true = _must_check_fbdn)
-       when not is_struct(filtered) do
-    case check_forbidden(:ok, params, filtered) do
-      :ok -> filtered
-      error -> error
+  defp check_forbidden_params(filtered, params, true) when not is_struct(filtered) do
+    with :ok <- check_forbidden(:ok, params, filtered) do
+      filtered
     end
   end
 
@@ -62,9 +57,8 @@ defmodule StrongParams.Filter do
     end
   end
 
-  defp deep_check_forbidden(previous_err, [head | _tail] = params_list, filtered, key)
-       when is_map(head) do
-    params_list
+  defp deep_check_forbidden(previous_err, [h | _t] = list, filtered, key) when is_map(h) do
+    list
     |> Enum.with_index()
     |> Enum.reduce(:ok, fn {params, index}, acc ->
       check_forbidden(acc, params, Enum.at(filtered, index))
@@ -76,40 +70,6 @@ defmodule StrongParams.Filter do
   end
 
   defp deep_check_forbidden(previous_err, _params, _filtered, _key), do: previous_err
-
-  defp fetch_key_value(key, filtered) do
-    with {:ok, key_as_atom} <- to_existing_atom(key) do
-      Map.fetch(filtered, key_as_atom)
-    end
-  end
-
-  defp to_existing_atom(string) do
-    {:ok, String.to_existing_atom(string)}
-  rescue
-    _any -> :error
-  end
-
-  defp add_forbidden_error(previous, key, new_err \\ nil)
-
-  defp add_forbidden_error(:ok = _previous, key, nil) do
-    %Error{type: "forbidden", errors: %{key => @forbidden_msg}}
-  end
-
-  defp add_forbidden_error(%Error{errors: errors} = error, key, nil) do
-    %{error | errors: Map.put(errors, key, @forbidden_msg)}
-  end
-
-  defp add_forbidden_error(previous, _key, :ok), do: previous
-
-  defp add_forbidden_error(:ok, key, %Error{errors: errors}) do
-    %Error{type: "forbidden", errors: %{key => errors}}
-  end
-
-  defp add_forbidden_error(%Error{errors: parent_errors} = error, key, %Error{errors: errors}) do
-    %{error | errors: Map.put(parent_errors, key, errors)}
-  end
-
-  ### ===== END
 
   defp apply_filters(initial, filters, params, mode) do
     {result, _params} = Enum.reduce(filters, {initial, params}, &reduce_function(&1, &2, mode))
@@ -238,7 +198,39 @@ defmodule StrongParams.Filter do
   defp add_to_result(%Error{} = error, _key, _value, _mode), do: error
   defp add_to_result(result, key, value, _mode), do: put_new(result, key, value)
 
+  defp add_forbidden_error(previous, key, new_err \\ nil)
+
+  defp add_forbidden_error(:ok = _previous, key, nil) do
+    %Error{type: "forbidden", errors: %{key => @forbidden_msg}}
+  end
+
+  defp add_forbidden_error(%Error{errors: errors} = error, key, nil) do
+    %{error | errors: Map.put(errors, key, @forbidden_msg)}
+  end
+
+  defp add_forbidden_error(previous, _key, :ok), do: previous
+
+  defp add_forbidden_error(:ok, key, %Error{errors: errors}) do
+    %Error{type: "forbidden", errors: %{key => errors}}
+  end
+
+  defp add_forbidden_error(%Error{errors: parent_errors} = error, key, %Error{errors: errors}) do
+    %{error | errors: Map.put(parent_errors, key, errors)}
+  end
+
   defp respond_reduce_with(result, params), do: {result, params}
+
+  defp fetch_key_value(key, filtered) do
+    with {:ok, key_as_atom} <- to_existing_atom(key) do
+      Map.fetch(filtered, key_as_atom)
+    end
+  end
+
+  defp to_existing_atom(string) do
+    {:ok, String.to_existing_atom(string)}
+  rescue
+    _any -> :error
+  end
 
   defp cast_value(:key_not_found, _type), do: :key_not_found
 

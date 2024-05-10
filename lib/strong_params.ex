@@ -9,15 +9,18 @@ defmodule StrongParams do
   It adds a `Plug` to filter request params before `Phoenix` call the respective
   controller action. This macro must be called inside a Phoenix controller implementation.
 
-  The first given argument must be a valid action name. The second must be a `Keyword`
+  The first given argument must be a valid action name. The second must be a `Keyword` opts
   with the list of required and permitted parameters. The `Keyword` may have both lists or
-  just one of them:
+  just one of them. Optionaly you can pass `forbidden_params_err` as true to enforce error
+  for received params not listed as permitted or required.
 
     * `:permitted` - List of parameters to keep. If some of listed parameters is missing no error is returned.
     * `:required` - List of parameters that are required. In case of missing parameters a error will be returned with a map enumerating the missing parameters.
+    * `:forbidden_params_err` - Boolean value to enforce error for received params not listed. Default is false.
 
   ```elixir
-  filter_for(:index, required: [:name, :email], permitted: [:nickname])
+  filter_for(:create, required: [:name, :email], permitted: [:nickname], forbidden_params_err: true)
+  filter_for(:update, required: [:name, :email], permitted: [:nickname])
   ```
 
   For nested parameters you must use a keyword.

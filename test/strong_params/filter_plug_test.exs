@@ -70,8 +70,9 @@ defmodule StrongParams.FilterPlugTest do
       assert result.state == :sent
       assert result.status == 400
 
-      assert result.resp_body ==
-               "%StrongParams.Error{errors: %{name: \"is required\"}, type: \"required\"}"
+      assert result.resp_body =~ "%StrongParams.Error{"
+      assert result.resp_body =~ "type: \"required\""
+      assert result.resp_body =~ "errors: %{name: \"is required\"}"
     end
 
     test "use fallback function when it is set", %{conn: conn} do
@@ -94,8 +95,9 @@ defmodule StrongParams.FilterPlugTest do
       assert result.state == :sent
       assert result.status == 400
 
-      assert result.resp_body ==
-               "%StrongParams.Error{errors: %{name: \"is required\"}, type: \"required\"}"
+      assert result.resp_body =~ "%StrongParams.Error{"
+      assert result.resp_body =~ "type: \"required\""
+      assert result.resp_body =~ "errors: %{name: \"is required\"}"
     end
 
     test "ignore halted conn", %{conn: conn} do

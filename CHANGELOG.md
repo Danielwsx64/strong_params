@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2024-05-10
+
+### Added
+
+- Add option to return error for forbidden parameters
+
 ## [0.2.3] - 2022-08-22
 
 ### Fix
@@ -53,7 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add lib documentation
 
-[unreleased]: https://github.com/Finbits/strong_params/compare/v0.2.3...main
+[unreleased]: https://github.com/Finbits/strong_params/compare/v0.3.0...main
+[0.3.0]: https://github.com/Finbits/strong_params/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/Finbits/strong_params/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/Finbits/strong_params/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/Finbits/strong_params/compare/v0.2.0...v0.2.1

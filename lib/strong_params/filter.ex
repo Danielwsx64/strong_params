@@ -6,7 +6,7 @@ defmodule StrongParams.Filter do
 
   defguardp is_cast_type(type) when is_atom(type) or is_tuple(type)
 
-  @forbidden_msg "is not a valid parameter"
+  @forbidden_msg "is not a permitted parameter"
   @invalid_msg "is invalid"
   @required_msg "is required"
 

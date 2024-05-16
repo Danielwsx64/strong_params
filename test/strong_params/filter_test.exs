@@ -462,7 +462,10 @@ defmodule StrongParams.FilterTest do
 
       result = Filter.apply(params, required: [:name, :description], forbidden_params_err: true)
 
-      assert result == %Error{type: "forbidden", errors: %{"role" => "is not a valid parameter"}}
+      assert result == %Error{
+               type: "forbidden",
+               errors: %{"role" => "is not a permitted parameter"}
+             }
     end
 
     test "return error for forbidden params when opt is given (multiple errors)" do
@@ -477,8 +480,8 @@ defmodule StrongParams.FilterTest do
       assert result == %Error{
                type: "forbidden",
                errors: %{
-                 "role" => "is not a valid parameter",
-                 "description" => "is not a valid parameter"
+                 "role" => "is not a permitted parameter",
+                 "description" => "is not a permitted parameter"
                }
              }
     end
@@ -511,7 +514,7 @@ defmodule StrongParams.FilterTest do
 
       assert result == %Error{
                type: "forbidden",
-               errors: %{"attachments" => %{"info" => %{"id" => "is not a valid parameter"}}}
+               errors: %{"attachments" => %{"info" => %{"id" => "is not a permitted parameter"}}}
              }
     end
 
@@ -545,11 +548,11 @@ defmodule StrongParams.FilterTest do
                errors: %{
                  "attachments" => %{
                    "info" => %{
-                     "id" => "is not a valid parameter",
-                     "type" => "is not a valid parameter"
+                     "id" => "is not a permitted parameter",
+                     "type" => "is not a permitted parameter"
                    }
                  },
-                 "name" => "is not a valid parameter"
+                 "name" => "is not a permitted parameter"
                }
              }
     end
@@ -583,7 +586,7 @@ defmodule StrongParams.FilterTest do
                type: "forbidden",
                errors: %{
                  "attachments" => %{
-                   "information" => %{"tags" => %{"deleted" => "is not a valid parameter"}}
+                   "information" => %{"tags" => %{"deleted" => "is not a permitted parameter"}}
                  }
                }
              }
@@ -619,13 +622,13 @@ defmodule StrongParams.FilterTest do
       assert result == %Error{
                type: "forbidden",
                errors: %{
-                 "name" => "is not a valid parameter",
+                 "name" => "is not a permitted parameter",
                  "attachments" => %{
-                   "extension" => "is not a valid parameter",
+                   "extension" => "is not a permitted parameter",
                    "information" => %{
                      "tags" => %{
-                       "deleted" => "is not a valid parameter",
-                       "root" => "is not a valid parameter"
+                       "deleted" => "is not a permitted parameter",
+                       "root" => "is not a permitted parameter"
                      }
                    }
                  }

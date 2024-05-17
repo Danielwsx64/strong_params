@@ -1,6 +1,5 @@
 defmodule StrongParams.Filter do
   @moduledoc false
-  import Map, only: [put_new: 3, get: 3]
 
   alias StrongParams.Error
 
@@ -94,7 +93,7 @@ defmodule StrongParams.Filter do
   defp resolve_conflict(_key, _original, override), do: override
 
   defp reduce_function(filter, {result, params}, mode) when is_atom(filter) do
-    params_value = get(params, to_string(filter), :key_not_found)
+    params_value = get_key(params, filter, :key_not_found)
 
     result
     |> add_to_result(filter, params_value, mode)
@@ -105,7 +104,7 @@ defmodule StrongParams.Filter do
        when is_atom(filter) and is_cast_type(type) do
     casted_value =
       params
-      |> get(to_string(filter), :key_not_found)
+      |> get_key(filter, :key_not_found)
       |> cast_value(type)
 
     result
@@ -114,7 +113,7 @@ defmodule StrongParams.Filter do
   end
 
   defp reduce_function({filter, filter_rest}, {result, params}, mode) when is_atom(filter) do
-    params_value = get(params, to_string(filter), :key_not_found)
+    params_value = get_key(params, filter, :key_not_found)
 
     partial_result =
       case {params_value, mode} do
@@ -196,7 +195,7 @@ defmodule StrongParams.Filter do
   end
 
   defp add_to_result(%Error{} = error, _key, _value, _mode), do: error
-  defp add_to_result(result, key, value, _mode), do: put_new(result, key, value)
+  defp add_to_result(result, key, value, _mode), do: Map.put_new(result, key, value)
 
   defp add_forbidden_error(previous, key, new_err \\ nil)
 
@@ -231,6 +230,15 @@ defmodule StrongParams.Filter do
   rescue
     _any -> :error
   end
+
+  defp get_key(%{} = map, key, default) do
+    case Map.fetch(map, to_string(key)) do
+      {:ok, value} -> value
+      :error -> Map.get(map, key, default)
+    end
+  end
+
+  defp get_key(_map, _key, default), do: default
 
   defp cast_value(:key_not_found, _type), do: :key_not_found
 

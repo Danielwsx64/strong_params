@@ -5,11 +5,25 @@ defmodule StrongParams.FilterTest do
   alias StrongParams.Filter
 
   describe "apply/3" do
-    test "filter and return required fields" do
+    test "filters and return required fields" do
       params = %{
         "name" => "Johnny Lawrence",
         "description" => "user description",
         "role" => "admin"
+      }
+
+      result = Filter.apply(params, required: [:name, :description])
+
+      assert result == %{
+               name: "Johnny Lawrence",
+               description: "user description"
+             }
+    end
+
+    test "filters mixed key-type maps" do
+      params = %{
+        :name => "Johnny Lawrence",
+        "description" => "user description"
       }
 
       result = Filter.apply(params, required: [:name, :description])
@@ -52,7 +66,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "cast errors" do
+    test "casts errors" do
       params = %{
         "id" => "invalid",
         "date" => "invalid"
@@ -63,7 +77,7 @@ defmodule StrongParams.FilterTest do
       assert result == %Error{errors: %{date: "is invalid", id: "is invalid"}, type: "invalid"}
     end
 
-    test "cast on missing keys" do
+    test "casts on missing keys" do
       params = %{}
 
       result = Filter.apply(params, permitted: [{:date, :date}])
@@ -71,7 +85,7 @@ defmodule StrongParams.FilterTest do
       assert result == %{}
     end
 
-    test "filter and return permitted fields" do
+    test "filters and return permitted fields" do
       params = %{
         "name" => "Johnny Lawrence",
         "description" => "user description",
@@ -86,7 +100,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "dont return error when permitted field is not found" do
+    test "does not return error when permitted field is not found" do
       params = %{
         "name" => "Johnny Lawrence",
         "description" => "user description",
@@ -101,7 +115,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "handle nested attributes" do
+    test "handles nested attributes" do
       params = %{
         "name" => "Johnny Lawrence",
         "address" => %{
@@ -139,7 +153,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "filter and return required and permitted" do
+    test "filters and return required and permitted" do
       params = %{
         "name" => "Johnny Lawrence",
         "address" => %{
@@ -164,7 +178,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "merge required and permitted" do
+    test "merges required and permitted" do
       params = %{
         "name" => "Johnny Lawrence",
         "attachments" => %{
@@ -185,7 +199,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "merge required and permitted in nested lists" do
+    test "merges required and permitted in nested lists" do
       params = %{
         "deep" => [
           %{
@@ -336,7 +350,7 @@ defmodule StrongParams.FilterTest do
       assert result == %Error{errors: %{attachments: "Must be a list"}, type: "type"}
     end
 
-    test "return error for required field" do
+    test "returns error for required field" do
       params = %{
         "name" => "Johnny Lawrence",
         "address" => %{
@@ -388,8 +402,8 @@ defmodule StrongParams.FilterTest do
 
     test "empty map and when value is not a map" do
       empty_params = %{}
-      params_with_empty_map = %{name: "Johnny Lawrence", nickname: "Johnny", address: %{}}
-      params_with_not_a_map = %{name: "Johnny Lawrence", nickname: "Johnny", address: []}
+      params_with_empty_map = %{address: %{}}
+      params_with_not_a_map = %{address: []}
 
       filters = [
         required: [:name, :nickname, address: [:city], attachments: [info: [:type, :size]]]
@@ -416,7 +430,7 @@ defmodule StrongParams.FilterTest do
       assert params_with_not_a_map_result == expected_error
     end
 
-    test "dont return permitted when required has errors" do
+    test "does not return permitted when required has errors" do
       params = %{
         "name" => "Johnny Lawrence",
         "address" => %{
@@ -453,7 +467,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "return error for forbidden params when opt is given" do
+    test "returns error for forbidden params when opt is given" do
       params = %{
         "name" => "Johnny Lawrence",
         "description" => "user description",
@@ -468,7 +482,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "return error for forbidden params when opt is given (multiple errors)" do
+    test "returns error for forbidden params when opt is given (multiple errors)" do
       params = %{
         "name" => "Johnny Lawrence",
         "description" => "user description",
@@ -486,7 +500,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "return error for forbidden params when opt is given (with nested params)" do
+    test "returns error for forbidden params when opt is given (with nested params)" do
       params = %{
         "name" => "Johnny Lawrence",
         "address" => %{
@@ -518,7 +532,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "return error for forbidden params when opt is given (multiple errors and nested params)" do
+    test "returns error for forbidden params when opt is given (multiple errors and nested params)" do
       params = %{
         "name" => "Johnny Lawrence",
         "address" => %{
@@ -557,7 +571,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "return error for forbidden params when opt is given (when parameters has lists)" do
+    test "returns error for forbidden params when opt is given (when parameters has lists)" do
       params = %{
         "name" => "Johnny Lawrence",
         "attachments" => [
@@ -592,7 +606,7 @@ defmodule StrongParams.FilterTest do
              }
     end
 
-    test "return error for forbidden params when opt is given (when parameters has lists with multiple errors)" do
+    test "returns error for forbidden params when opt is given (when parameters has lists with multiple errors)" do
       params = %{
         "name" => "Johnny Lawrence",
         "attachments" => [

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-02-23
+### Fix
+
+- Fixed Ecto.Enum cast error handling
+
 ## [0.4.1] - 2024-05-17
 
 ### Fix
@@ -71,7 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add lib documentation
 
-[unreleased]: https://github.com/Finbits/strong_params/compare/v0.4.1...main
+[unreleased]: https://github.com/Finbits/strong_params/compare/v0.4.2...main
+[0.4.2]: https://github.com/Finbits/strong_params/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/Finbits/strong_params/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Finbits/strong_params/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Finbits/strong_params/compare/v0.2.3...v0.3.0

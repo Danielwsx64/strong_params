@@ -42,7 +42,7 @@ defmodule StrongParams.MixProject do
   defp deps do
     [
       {:plug, " ~> 1.11"},
-      {:ecto, "~> 3.7", optional: true},
+      {:ecto, "~> 3.13", optional: true},
 
       # Dev/Test dependencies
 

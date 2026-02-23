@@ -69,12 +69,27 @@ defmodule StrongParams.FilterTest do
     test "casts errors" do
       params = %{
         "id" => "invalid",
-        "date" => "invalid"
+        "date" => "invalid",
+        "type" => "invalid"
       }
 
-      result = Filter.apply(params, required: [{:id, Ecto.UUID}, {:date, :date}])
+      result =
+        Filter.apply(params,
+          required: [
+            {:id, Ecto.UUID},
+            {:date, :date},
+            {:type, Ecto.ParameterizedType.init(Ecto.Enum, values: [:type_a])}
+          ]
+        )
 
-      assert result == %Error{errors: %{date: "is invalid", id: "is invalid"}, type: "invalid"}
+      assert result == %Error{
+               errors: %{
+                 type: "is invalid",
+                 date: "is invalid",
+                 id: "is invalid"
+               },
+               type: "invalid"
+             }
     end
 
     test "casts on missing keys" do

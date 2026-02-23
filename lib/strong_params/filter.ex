@@ -246,6 +246,7 @@ defmodule StrongParams.Filter do
     defp cast_value(value, type) do
       case Ecto.Type.cast(type, value) do
         {:ok, casted_value} -> casted_value
+        {:error, _reason} -> :invalid_value
         :error -> :invalid_value
       end
     end
